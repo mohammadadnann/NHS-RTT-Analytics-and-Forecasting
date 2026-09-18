@@ -1,10 +1,9 @@
 """
 Pipeline orchestration
 
-
 Calls extract, then transform, then load, for every new monthly file
-sitting in data/raw. Already loaded months are skipped, so it is always
-safe to rerun this.
+in Azure Blob Storage. Already loaded months are skipped, so it is
+always safe to rerun this.
 """
 
 from src.etl import extract, transform, load
@@ -14,7 +13,7 @@ def run_pipeline():
     csv_files = extract.list_raw_files()
 
     if not csv_files:
-        print("No raw files found in data/raw. Nothing to do.")
+        print("No raw files found in Blob Storage. Nothing to do.")
         return
 
     engine = load.get_engine()
@@ -28,16 +27,16 @@ def run_pipeline():
     band_id_lookup = load.load_band_reference(engine, bands_df)
     print(f"Week band lookup ready, {len(band_id_lookup)} bands")
 
-    for csv_path in csv_files:
-        period_date = extract.get_period_date(csv_path)
+    for blob_name in csv_files:
+        period_date = extract.get_period_date(blob_name)
 
         if period_date in loaded_periods:
-            print(f"\nSkipping {csv_path.name}, {period_date} already loaded")
+            print(f"\nSkipping {blob_name}, {period_date} already loaded")
             continue
 
-        print(f"\nProcessing {csv_path.name} ...")
+        print(f"\nProcessing {blob_name} ...")
 
-        raw_df = extract.read_csv_file(csv_path)
+        raw_df = extract.read_csv_file(blob_name)
         print(f"  Read {len(raw_df):,} rows")
 
         clean_df = transform.remove_total_rows(raw_df)

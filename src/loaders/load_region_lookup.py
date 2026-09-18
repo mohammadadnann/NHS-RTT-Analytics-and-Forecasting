@@ -14,11 +14,7 @@ before loading, since that is the grain I actually need for the join.
 import pandas as pd
 from sqlalchemy import create_engine, text
 
-DB_USER = "root"
-DB_PASSWORD = "optima123!"
-DB_HOST = "127.0.0.1"
-DB_PORT = 3306
-DB_NAME = "nhs_rtt_analytics"
+from src.config import DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME
 
 CSV_PATH = "data/reference/icb_region_lookup.csv"
 
